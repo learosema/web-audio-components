@@ -2,3 +2,9 @@
   display: block;
   border: 1px solid red;
 }
+
+h1 {
+  font-size: 18px;
+  margin: 0;
+  padding: 4px;
+}
