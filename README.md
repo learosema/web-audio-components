@@ -4,8 +4,9 @@ This is an experiment using the Web Audio API and WebComponents with vanilla jav
 
 ## Installation and running
 
-* No `npm install` (for now). 
-* `npm start` uses PHP to start a development web server. If you don't want to use PHP, fair alternatives are `python -m SimpleHTTPServer` or the node [http-server](https://npmjs.com/package/http-server).
+* No `npm install` (for now).
+* `npm start` uses PHP to start a development web server at http://localhost:8000/. 
+* If you don't want to use PHP, fair alternatives are `python -m SimpleHTTPServer` or the node [http-server](https://npmjs.com/package/http-server).
 
 ## Resources
 
