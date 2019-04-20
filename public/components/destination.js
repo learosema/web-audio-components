@@ -1,14 +1,18 @@
 import audioContext from '../audio-context.js';
 
-export default class Destination {
+export default class Destination extends HTMLElement {
 
   static register() {
     customElements.define('x-destination', Destination);
   }
 
+  get destination() {
+    return this._destination;
+  }
+
   constructor () {
     super();
-    this.destination = audioContext.destination;
+    this._destination = audioContext.destination;
   }
 
 }

@@ -41,8 +41,11 @@ export default class GainControl extends HTMLElement {
     if (name === "connect") {
       const target = document.getElementById(newValue);
       if (target.nodeName === "X-DESTINATION") {
-        // TODO: after element upgrade
-        // this._gain.connect(target.destination);
+        console.log('blub...', target)
+        customElements.whenDefined('x-destination').then(() => {
+          this._gain.connect(target.destination);
+          console.log(this.nodeName, "connecting to ", target.nodeName);
+        });
       }
     }
   }

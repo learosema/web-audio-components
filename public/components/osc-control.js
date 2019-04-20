@@ -58,17 +58,23 @@ export default class OscControl extends HTMLElement {
     if (name === "connect") {
       const target = document.getElementById(newValue)
       if (target.nodeName === 'X-GAIN-CONTROL') {
-        // TODO: after element upgrade
-        // this._osc.connect(target._gain);
+        customElements.whenDefined('x-gain-control').then(() => {
+          console.log(this.nodeName, "connecting to ", target.nodeName);
+          this._osc.connect(target._gain);
+        });
         return;
       }
       if (target.nodeName === 'X-DESTINATION') {
         // TODO: after element upgrade
         // this._osc.connect(target.destination);
+        customElements.whenDefined('x-destination').then(() => {
+          console.log(this.nodeName, "connecting to ", target.nodeName);
+          this._osc.connect(target.destination);
+        });
         return;
       }
     }
-    if (name === "autostart") {
+    if (name === "start") {
       this.start();
     }
   }
@@ -86,10 +92,16 @@ export default class OscControl extends HTMLElement {
     `
     this.freqSlider = this.shadowRoot.getElementById('freqSlider');
     this.freqSlider.addEventListener('change', e => {
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
       this.freq = this.freqSlider.value;
     });
     this.waveSelect = this.shadowRoot.getElementById('waveSelect')
     this.waveSelect.addEventListener('change', e => {
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
       this.type = this.waveSelect.value;
     });
   }

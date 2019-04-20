@@ -9,7 +9,7 @@
   </head>
   <body>
     
-    <x-osc-control id="osc1" type="sine" freq="55" autostart connect="gain1"></x-osc-control>
+    <x-osc-control id="osc1" type="sine" freq="55" connect="gain1" start></x-osc-control>
     <x-gain-control id="gain1" value="0.1" connect="dest"></x-gain-control>
     <x-destination id="dest"></x-destination>
     <script type="module" src="index.js"></script>
