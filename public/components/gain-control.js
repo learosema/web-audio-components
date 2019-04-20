@@ -1,28 +1,26 @@
-import audioContext from '../audio-context.js';
+import audioContext from "../audio-context.js";
 
 export default class GainControl extends HTMLElement {
-
-  static observedAttributes = ['value', 'connect'];
+  static observedAttributes = ["value", "connect"];
   _initialized = false;
 
   static register() {
-    customElements.define('x-gain-control', GainControl);
+    customElements.define("x-gain-control", GainControl);
   }
 
   constructor() {
     super();
-    this._gain = audioContext.createGain()
-    this.attachShadow({mode: 'open'})
+    this._gain = audioContext.createGain();
+    this.attachShadow({ mode: "open" });
   }
 
   get value() {
-    return this.getAttribute('value')
+    return this.getAttribute("value");
   }
 
   set value(val) {
-    this.setAttribute('value', val);
+    this.setAttribute("value", val);
   }
-
 
   connectedCallback() {
     if (!this._initialized) {
@@ -39,12 +37,10 @@ export default class GainControl extends HTMLElement {
       this._gain.gain.value = newValue;
     }
     if (name === "connect") {
-      const target = document.getElementById(newValue);
+      const target = this.getRootNode().querySelector("#" + newValue);
       if (target.nodeName === "X-DESTINATION") {
-        console.log('blub...', target)
-        customElements.whenDefined('x-destination').then(() => {
+        customElements.whenDefined("x-destination").then(() => {
           this._gain.connect(target.destination);
-          console.log(this.nodeName, "connecting to ", target.nodeName);
         });
       }
     }
@@ -56,8 +52,11 @@ export default class GainControl extends HTMLElement {
       <input id="gainSlider" type="range" min="0" max="1" step="0.01"
                              value="${this._gain.gain.value}">
     `;
-    this.gainSlider = this.shadowRoot.getElementById('gainSlider');
-    this.gainSlider.addEventListener('change', e => {
+    this.gainSlider = this.shadowRoot.getElementById("gainSlider");
+    this.gainSlider.addEventListener("input", e => {
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
       this.value = this.gainSlider.value;
     });
   }
