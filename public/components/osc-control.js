@@ -2,11 +2,17 @@ import audioContext from '../audio-context.js';
 
 export default class OscControl extends HTMLElement {
 
+  static observedAttributes = ["type", "freq", "autostart"];
+
   static register() {
     customElements.define('x-osc-control', OscControl);
   }
 
-  static observedAttributes = ["type", "freq", "autostart"];
+  constructor() {
+    super();
+    this._osc = audioContext.createOscillator();
+    this.attachShadow({mode: 'open'});
+  }
 
   get type() {
     return this.getAttribute('type') || 'sine';
@@ -24,14 +30,7 @@ export default class OscControl extends HTMLElement {
     this.setAttribute('freq', val)
   }
 
-  constructor() {
-    super();
-    this._osc = audioContext.createOscillator();
-    this.attachShadow({mode: 'open'});
-  }
-
   connectedCallback() {
-    console.log("connected Callback.");
     if (this.freqSlider) {
       return;
     }
@@ -39,44 +38,32 @@ export default class OscControl extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    // TODO: attributeChangedCallback may be called before connectedCallback
-    //       is ready
-
-    // some debug output:
-    console.log("attributeChanged Callback.", name, oldValue, newValue, 
-      this.waveSelect ? "waveSelect" : "no_waveSelect",
-      this.freqSlider ? "freqSlider" : "no_freqSlider"
-    );
-    if (name === "type" && this.waveSelect) {
-      this.waveSelect.value = newValue;
+    if (name === "type") {
+      if (this.waveSelect) {
+        this.waveSelect.value = newValue;
+      }
       this._osc.type = newValue;
       return;
     }
-    if (name === "freq" && this.freqSlider) {
-      this.freqSlider.value = newValue;
+    if (name === "freq") {
+      if (this.freqSlider) {
+        this.freqSlider.value = newValue;
+      }
       this._osc.frequency.value = newValue;
       return;
     }
-  }
-
-  readAttributes() {
-    // properties may have been set before the element has been
-    // upgraded, so just read and set the attributes again.
-    this.constructor.observedAttributes.map(attr => {
-      const val = this.getAttribute(attr);
-      this.setAttribute(attr, val);
-    });
   }
 
   initUI() {
     this.shadowRoot.innerHTML = `
       <link rel="stylesheet" href="./components/osc-control.css">
       <select id="waveSelect">
-        <option>sine</option>
-        <option>square</option>
-        <option>triangle</option>
+        <option${this._osc.type === 'sine'?' selected':''}>sine</option>
+        <option${this._osc.type === 'square'?' selected':''}>square</option>
+        <option${this._osc.type === 'triangle'?' selected':''}>triangle</option>
+        <option${this._osc.type === 'sawtooth'?' selected':''}>sawtooth</option>
       </select>
-      <input id="freqSlider" type="range" min="1" max="1000" step="1" value="">
+      <input id="freqSlider" type="range" min="1" max="1000" step="1" value="${this._osc.frequency.value}">
     `
     this.freqSlider = this.shadowRoot.getElementById('freqSlider');
     this.freqSlider.addEventListener('change', e => {
@@ -85,8 +72,7 @@ export default class OscControl extends HTMLElement {
     this.waveSelect = this.shadowRoot.getElementById('waveSelect')
     this.waveSelect.addEventListener('change', e => {
       this.type = this.waveSelect.value;
-    })
-    this.readAttributes();
+    });
   }
 
   start() {
