@@ -2,7 +2,10 @@ import audioContext from '../audio-context.js';
 
 export default class OscControl extends HTMLElement {
 
-  static observedAttributes = ["type", "freq", "autostart"];
+  static observedAttributes = ["type", "freq", "start", "connect"];
+
+  _initialized = false;
+  _started = false;
 
   static register() {
     customElements.define('x-osc-control', OscControl);
@@ -23,7 +26,7 @@ export default class OscControl extends HTMLElement {
   }
 
   get freq() {
-    return this.getAttribute('freq') || 0;
+    return this.getAttribute('freq') || '440';
   }
 
   set freq(val) {
@@ -52,6 +55,22 @@ export default class OscControl extends HTMLElement {
       this._osc.frequency.value = newValue;
       return;
     }
+    if (name === "connect") {
+      const target = document.getElementById(newValue)
+      if (target.nodeName === 'X-GAIN-CONTROL') {
+        // TODO: after element upgrade
+        // this._osc.connect(target._gain);
+        return;
+      }
+      if (target.nodeName === 'X-DESTINATION') {
+        // TODO: after element upgrade
+        // this._osc.connect(target.destination);
+        return;
+      }
+    }
+    if (name === "autostart") {
+      this.start();
+    }
   }
 
   initUI() {
@@ -76,7 +95,12 @@ export default class OscControl extends HTMLElement {
   }
 
   start() {
-    this._osc.start();
+    if (! this._started) {
+      this._osc.start();
+      this._started = true;
+      return true;
+    }
+    return false;
   }
 
 }
